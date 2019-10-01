@@ -1,13 +1,17 @@
 title: The KUHNKE OOT Module
-brief: Short description of gr-kuhnke
+brief: Feed Forward Frequency and Phase recovery for M-PSK
 tags: # Tags are arbitrary, but look at CGRAN what other authors are using
   - sdr
+  - m-psk
+  - psk
+  - estimation
+  - correction
 author:
   - Maximilian Kuhnke
 copyright_owner:
   - Maximilian Kuhnke
 license: GPL v3
-repo: https://github.com/kuhnke-m/gr-kuhnke.git
+repo: https://github.com/kuhnke-m/gr-mthpower.git
 #website: <module_website> # If you have a separate project website, put it here
 #icon: <icon_url> # Put a URL to a square image here that will be used as an icon on CGRAN
 ---
