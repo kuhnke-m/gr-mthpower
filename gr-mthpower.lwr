@@ -1,7 +1,0 @@
-category: common
-depends:
-- gnuradio
-description: M-PSK Frequency and Phase recovery
-gitbranch: master
-inherit: cmake
-source: git+https://github.com/kuhnke-m/gr-mthpower.lwr
