@@ -197,6 +197,38 @@ class qa_m_th_power_v1_cc (gr_unittest.TestCase):
         result_data = self.base(source_data)
         self.assertComplexTuplesAlmostEqual(expected_data, result_data, self.precision)
 
+    # test average for 8-PSK
+    def test_average8psk(self):
+        self.N = 4 # average over 4 samples
+        self.M = 8 # QPSK
+        self.phase = 0
+
+        a = 1.11
+        b_base = pi/8
+        b_offset = pi/16
+        b = 2*[b_base+b_offset,] + 2*[b_base-b_offset,]
+        source_data = []
+        expected_data = []
+        for i in range(len(b)):
+            source_data.append(cmath.rect(a, b[i]))
+
+        # this doesn't work with the algorithm because it averages before taking the angle
+        # (it doesn't really result in the average angle)
+        #
+        #for i in range(len(b)):
+        #    expected_data.append(source_data[i] * cmath.rect(1, -b_base))
+
+        # But this does. It emulates what the algorithm is doing then compares the result.
+        summe = 0
+        for i in range(len(b)):
+            summe = summe + cmath.rect(pow(a, self.M), b[i]*self.M)
+        angle_correct = -cmath.phase(summe)/self.M
+        for i in range(len(b)):
+            expected_data.append(source_data[i]*cmath.rect(1, angle_correct))
+
+        result_data = self.base(source_data)
+        self.assertComplexTuplesAlmostEqual(expected_data, result_data, self.precision)
+
     # averaging test
     def test_average2(self):
         self.N = 4 # average over 4 samples
@@ -229,9 +261,9 @@ class qa_m_th_power_v1_cc (gr_unittest.TestCase):
         result_data = self.base(source_data)
         self.assertComplexTuplesAlmostEqual(expected_data, result_data, self.precision)
 
-    def base_phase_unwrapping(self, phase_increment=2*pi/100):
+    def base_phase_unwrapping(self, phase_increment=2*pi/100, M=4):
         self.N = 1
-        self.M = 4
+        self.M = M
         self.phase = 0
 
         a = 1.11
@@ -261,9 +293,9 @@ class qa_m_th_power_v1_cc (gr_unittest.TestCase):
     # test unwrapping limit (amount of phase increment our algorithm can handle)
     # ..Extensive test..
     def test_phase_unwrapping2(self):
-        inc = 2*pi/50
+        inc =   pi/50
         start = pi/8
-        end = 2*pi/3
+        end =   pi/3
         for i in range(int(math.floor((end-start)/inc))):
             phase_inc = start+inc*i
             try:
@@ -277,6 +309,22 @@ class qa_m_th_power_v1_cc (gr_unittest.TestCase):
                 raise self.FailureException('algorithm doesn\'t work as expected, phase increments dont match theory')
         raise self.FailureException('this should not occur?!?!')
 
+    def test_phase_unwrapping8psk(self):
+        inc =   pi/80
+        start = pi/16
+        end =   pi/4
+        for i in range(int(math.floor((end-start)/inc))):
+            phase_inc = start+inc*i
+            try:
+                self.base_phase_unwrapping(phase_inc, M=8)
+            except:
+                cur_phase_inc = phase_inc
+                pre_phase_inc = phase_inc-inc
+                print 'Stopped working on: i=', i, ' previous_phase_inc=', (pre_phase_inc)*180/pi, ' current_phase_inc=', cur_phase_inc*180/pi
+                if pre_phase_inc <= (pi / 8) and cur_phase_inc >= (pi / 8):
+                    return
+                raise self.FailureException('algorithm doesn\'t work as expected, phase increments dont match theory')
+        raise self.FailureException('this should not occur?!?!')
 
 if __name__ == '__main__':
     gr_unittest.run(qa_m_th_power_v1_cc, "qa_m_th_power_v1_cc.xml")
