@@ -4,7 +4,7 @@
   <key>mthpower_m_th_power_v1_cc</key>
   <category>[mthpower]</category>
   <import>import mthpower</import>
-  <make>mthpower.m_th_power_v1_cc()</make>
+  <make>mthpower.m_th_power_v1_cc($N, $M, $phase)</make>
 
   <param>
     <name>Block Size = Vec Length</name>
